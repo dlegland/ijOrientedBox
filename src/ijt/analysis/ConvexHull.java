@@ -87,7 +87,8 @@ public class ConvexHull
 				
 				// if V1-V2-V3 is oriented CW, use V3 as next wrapping candidate
 				double determinate = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
-				if (determinate < 0)
+//				if (determinate < 0)
+				if (determinate < 1e-12)
 				{
 					x2 = x3;
 					y2 = y3;

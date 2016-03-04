@@ -171,7 +171,7 @@ public class FeretDiameters
 	
 	/**
 	 * Returns a set of points located at the corners of a binary particle.
-	 * Point coordinates are integer +/- .5.
+	 * Point coordinates are integer (ImageJ locates pixels in a [0 1]^d area.
 	 * 
 	 * @param image
 	 *            a binary image representing the particle
@@ -283,7 +283,10 @@ public class FeretDiameters
 	 */
 	public static class AngleDiameterPair
 	{
+		/** Angle in radians */
 		public double angle;
+
+		/** Diameter computed in the direction of the angle */
 		public double diameter;
 		
 		public AngleDiameterPair(double angle, double diameter)

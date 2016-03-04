@@ -93,7 +93,6 @@ public class Vector2D
 		// compute angle using arc-tangent to get better precision for angles
 		// near zero, see the discussion in: 
 		// http://www.mathworks.com/matlabcentral/newsreader/view_thread/151925#381952
-		// angle = mod(atan2(x1*y2-x2*y1,x1*x2+y1*y2),2*pi);
 		return Math.atan2(v1.x * v2.y - v2.x * v1.y, v1.x * v2.x + v1.y * v2.y);
 	}
 	

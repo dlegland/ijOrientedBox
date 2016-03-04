@@ -30,8 +30,25 @@ public class OrientedBox_Circles
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		imagePlus.show();
 
-		// use pre-computed oriented box
-		OrientedBox obox = new OrientedBox(108.2667, 130.0151, 268.9114, 109.2686, 61);
+		ImageProcessor image = imagePlus.getProcessor();
+		ArrayList<Point2D> points = FeretDiameters.binaryParticleCorners(image);
+		
+		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
+		PolygonRoi hullRoi = createPolygonRoi(convexHull);
+		imagePlus.setRoi(hullRoi, true);
+		
+		System.out.println("number of points: " + points.size());
+		OrientedBox obox = OrientedBox.computeBox(points);
+
+		System.out.println("oriented box: ");
+		System.out.println("  xc: " + obox.x0);
+		System.out.println("  yc: " + obox.y0);
+		System.out.println("  l:  " + obox.length);
+		System.out.println("  w:  " + obox.width);
+		System.out.println("  Th:  " + obox.theta);
+
+//		// use pre-computed oriented box
+//		OrientedBox obox = new OrientedBox(108.2667, 130.0151, 268.9114, 109.2686, 61);
 		
 		PolygonRoi roi = obox.getRoi();
 		roi.setStrokeColor(Color.GREEN);

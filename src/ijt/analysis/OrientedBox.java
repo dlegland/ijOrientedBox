@@ -4,7 +4,6 @@
 package ijt.analysis;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 
 import ij.ImagePlus;
@@ -26,10 +25,67 @@ public class OrientedBox
 		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
 		
 		// compute convex hull centroid
+		Point2D center = polygonCentroid(convexHull);
+		double cx = center.getX();
+		double cy = center.getY();
 		
-		return null;
+		// recenter the convex hull
+		ArrayList<Point2D> centeredHull = new ArrayList<Point2D>(convexHull.size());
+		for (Point2D p : convexHull)
+		{
+			centeredHull.add(new Point2D.Double(p.getX() - cx, p.getY() - cy));
+		}
+		
+		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
+//		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
 		
 		
+		// orientation of the main axis
+		// pre-compute trigonometric functions
+		double cot = Math.cos(minFeret.angle);
+		double sit = Math.sin(minFeret.angle);
+
+		// compute elongation in direction of rectangle length and width
+		double xmin = Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double xmax = Double.MIN_VALUE;
+		double ymax = Double.MIN_VALUE;
+		for (Point2D p : centeredHull)
+		{
+			// coordinates of current point
+			double x = p.getX(); 
+			double y = p.getY();
+			
+			// compute rotated coordinates
+			double x2 = x * cot + y * sit; 
+			double y2 = - x * sit + y * cot;
+			
+			// update bounding box
+			xmin = Math.min(xmin, x2);
+			ymin = Math.min(ymin, y2);
+			xmax = Math.max(xmax, x2);
+			ymax = Math.max(ymax, y2);
+		}
+		
+		// position of the center with respect to the centroid compute before
+		double dl = (xmax + xmin) / 2;
+		double dw = (ymax + ymin) / 2;
+
+		// change coordinates from rectangle to user-space
+		double dx  = dl * cot - dw * sit;
+		double dy  = dl * sit + dw * cot;
+
+		// coordinates of oriented box center
+		cx += dx;
+		cy += dy;
+
+		// size of the rectangle
+		double rectLength  = xmax - xmin;
+		double rectWidth   = ymax - ymin;
+		
+		double angleDegrees = Math.toDegrees(minFeret.angle);
+
+		return new OrientedBox(cx, cy, rectLength, rectWidth, angleDegrees);
 	}
 	
 	public static final Point2D polygonCentroid(ArrayList<? extends Point2D> vertices)
@@ -56,7 +112,10 @@ public class OrientedBox
 			sumC += common;
 		}
 		
-		sumC *= 6;
+		// the area is the sum of the common factors divided by 2, 
+		// but we need to divide by 6 for centroid computation, 
+		// resulting in a factor 3.
+		sumC *= 6 / 2;
 		return new Point2D.Double(sumX / sumC, sumY / sumC);
 	}
 	

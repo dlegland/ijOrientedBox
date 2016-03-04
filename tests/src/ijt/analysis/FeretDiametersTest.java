@@ -17,10 +17,9 @@ public class FeretDiametersTest
 {
 
 	@Test
-	public void feretDiameter_single()
+	public void maxFeretDiameter_single()
 	{
 		String fileName = new File("files/circles.tif").getPath();
-//		System.out.println("file: " + fileName);
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		assertNotNull(imagePlus);
 		
@@ -28,6 +27,19 @@ public class FeretDiametersTest
 		double diameter = FeretDiameters.maxFeretDiameterSingle(image).diameter;
 		
 		assertEquals(272.71, diameter, .05);
+	}
+
+	@Test
+	public void minFeretDiameter_single()
+	{
+		String fileName = new File("files/circles.tif").getPath();
+		ImagePlus imagePlus = IJ.openImage(fileName);
+		assertNotNull(imagePlus);
+		
+		ImageProcessor image = imagePlus.getProcessor();
+		double diameter = FeretDiameters.minFeretDiameterSingle(image).diameter;
+		
+		assertEquals(108.8, diameter, .05);
 	}
 
 
