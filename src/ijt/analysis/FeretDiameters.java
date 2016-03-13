@@ -74,6 +74,19 @@ public class FeretDiameters
 
 
 	/**
+	 * Computes Minimum Feret diameter of a set of points and returns both the
+	 * diameter and the corresponding angle.
+	 * 
+	 * @param points
+	 *            a collection of planar points
+	 * @return the minimum Feret diameter of the point set
+	 */
+	public final static AngleDiameterPair minFeretDiameter(ArrayList<? extends Point2D> points)
+	{
+		 return minFeretDiameterNaive(points);
+	}
+	 
+	/**
 	 * Computes Minimum Feret diameter of a set of points, using the rotating
 	 * caliper algorithm.
 	 * 
@@ -81,7 +94,7 @@ public class FeretDiameters
 	 *            a collection of planar points
 	 * @return the minimum Feret diameter of the point set
 	 */
-	public final static AngleDiameterPair minFeretDiameter(ArrayList<? extends Point2D> points)
+	public final static AngleDiameterPair minFeretDiameterRotatingCaliper(ArrayList<? extends Point2D> points)
 	{
 		// first compute convex hull to simplify
 		ArrayList<Point2D> convHull = ConvexHull.convexHull_jarvis(points);

@@ -20,6 +20,13 @@ import ij.gui.Roi;
  */
 public class OrientedBox
 {
+	/**
+	 * Computes the object-oriented bounding box of a set of points.
+	 * 
+	 * @param points
+	 *            a list of points (not necessarily ordered)
+	 * @return the oriented box of this set of points.
+	 */
 	public static final OrientedBox computeBox(ArrayList<? extends Point2D> points)
 	{
 		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
@@ -36,7 +43,7 @@ public class OrientedBox
 			centeredHull.add(new Point2D.Double(p.getX() - cx, p.getY() - cy));
 		}
 		
-		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameterNaive(centeredHull);
+		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
 //		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
 		
 		
@@ -80,12 +87,13 @@ public class OrientedBox
 		cy += dy;
 
 		// size of the rectangle
-		double rectLength  = xmax - xmin;
-		double rectWidth   = ymax - ymin;
+		double length  = xmax - xmin;
+		double width   = ymax - ymin;
 		
-		double angleDegrees = Math.toDegrees(minFeret.angle);
+		// store angle in degrees
+		double angle = Math.toDegrees(minFeret.angle);
 
-		return new OrientedBox(cx, cy, rectLength, rectWidth, angleDegrees);
+		return new OrientedBox(cx, cy, length, width, angle);
 	}
 	
 	public static final Point2D polygonCentroid(ArrayList<? extends Point2D> vertices)
@@ -170,9 +178,11 @@ public class OrientedBox
 	{
 		Roi roi = this.getRoi();
 		
+		// convert to overlay
 		Overlay overlay = new Overlay();
 		overlay.add(roi);
 		
+		// add overlay on current image
 		imp.setOverlay(overlay);
 	}
 	
@@ -193,6 +203,7 @@ public class OrientedBox
 		double l2 = this.length / 2;
 		double w2 = this.width / 2;
 		
+		// compute box vertex coordinates
 		float[] px = new float[4]; 
 		float[] py = new float[4]; 
 		px[0] = (float) ( l2 * cot - w2 * sit + this.x0);

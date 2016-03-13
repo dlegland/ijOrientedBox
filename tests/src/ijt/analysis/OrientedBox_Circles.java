@@ -14,7 +14,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * Run convex hull algorithm on circles.tif image, and display result using ImageJ.
+ * Computes oriented bounding box of circles.tif image, and displays result
+ * using ImageJ.
  * 
  * @author dlegland
  *
@@ -52,7 +53,7 @@ public class OrientedBox_Circles
 		
 		PolygonRoi roi = obox.getRoi();
 		roi.setStrokeColor(Color.GREEN);
-		roi.setStrokeWidth(2);
+		roi.setStrokeWidth(.5);
 		
 		Overlay ovr = new Overlay();
 		ovr.add(roi);
