@@ -36,7 +36,7 @@ public class OrientedBox
 			centeredHull.add(new Point2D.Double(p.getX() - cx, p.getY() - cy));
 		}
 		
-		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
+		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameterNaive(centeredHull);
 //		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
 		
 		

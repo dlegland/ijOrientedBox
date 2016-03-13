@@ -18,21 +18,6 @@ public class FeretDiameters
 	public final static double TWO_PI = Math.PI * 2;
 	
 	/**
-	 * Computes Minimum Feret diameter from a single particle in a binary image.
-	 *  
-	 * @param image a binary image representing the particle.
-	 * @return the minimum Feret diameter of the particle
-	 */
-	public final static AngleDiameterPair minFeretDiameterSingle(ImageProcessor image)
-	{
-		ArrayList<Point> points = boundaryPoints(image);
-		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(points);
-
-		return minFeretDiameter(convHull);
-	}
-	
-
-	/**
 	 * Computes Maximum Feret diameter from a single particle in a binary image.
 	 *  
 	 * @param image a binary image representing the particle.
@@ -73,6 +58,21 @@ public class FeretDiameters
 		return new AngleDiameterPair(angleMax, distMax);
 	}
 	
+	/**
+	 * Computes Minimum Feret diameter from a single particle in a binary image.
+	 *  
+	 * @param image a binary image representing the particle.
+	 * @return the minimum Feret diameter of the particle
+	 */
+	public final static AngleDiameterPair minFeretDiameterSingle(ImageProcessor image)
+	{
+		ArrayList<Point> points = boundaryPoints(image);
+		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(points);
+	
+		return minFeretDiameter(convHull);
+	}
+
+
 	/**
 	 * Computes Minimum Feret diameter of a set of points, using the rotating
 	 * caliper algorithm.
@@ -166,6 +166,59 @@ public class FeretDiameters
 		    }
 		}
 
+		return new AngleDiameterPair(angleMin - Math.PI/2, widthMin);				
+	}
+	
+	/**
+	 * Computes Minimum Feret diameter of a set of points, using the rotating
+	 * caliper algorithm.
+	 * 
+	 * @param points
+	 *            a collection of planar points
+	 * @return the minimum Feret diameter of the point set
+	 */
+	public final static AngleDiameterPair minFeretDiameterNaive(ArrayList<? extends Point2D> points)
+	{
+		// first compute convex hull to simplify
+		ArrayList<Point2D> convHull = ConvexHull.convexHull_jarvis(points);
+		int n = convHull.size();
+
+		// initialize result
+		double width;
+		double widthMin = Double.POSITIVE_INFINITY;
+		double angleMin = 0;
+		StraightLine2D line;
+
+		for (int i = 0; i < n; i++)
+		{
+			Point2D p1 = convHull.get(i);
+			Point2D p2 = convHull.get((i + 1) % n);
+			
+			// avoid degenerated lines
+			if (p1.distance(p2) < 1e-12)
+			{
+				continue;
+			}
+
+			// Compute the width for this polygon edge
+			line = new StraightLine2D(p1, p2);
+			width = 0;
+			for (Point2D p : convHull)
+			{
+				double dist = line.distance(p);
+				width = Math.max(width, dist);
+			}
+			
+			// check if smallest width
+			if (width < widthMin)
+			{
+				widthMin = width;
+				double dx = p2.getX() - p1.getX();
+				double dy = p2.getY() - p1.getY();
+				angleMin = Math.atan2(dy, dx);
+			}
+		}
+				
 		return new AngleDiameterPair(angleMin - Math.PI/2, widthMin);				
 	}
 	
