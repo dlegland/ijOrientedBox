@@ -113,41 +113,39 @@ public class ConvexHull
 	 */
 	public static final ArrayList<Point> convexHull_jarvis_int(ArrayList<Point> vertices)
 	{
-		// Get polygon info
+		// create array for storing polygon coordinates
 		int n = vertices.size();
-		int[] xCoordinates = new int[n];
-		int[] yCoordinates = new int[n];
+		int[] xCoords = new int[n];
+		int[] yCoords = new int[n];
 		
+		// extract vertex coordinates
 		for (int i = 0; i < n; i++)
 		{
 			Point vertex = vertices.get(i);
-			xCoordinates[i] = vertex.x;
-			yCoordinates[i] = vertex.y;
+			xCoords[i] = vertex.x;
+			yCoords[i] = vertex.y;
 		}
 		
-		// convex hull coordinates
+		// create structure for storing convex hull coordinates
 		ArrayList<Point> hull = new ArrayList<>();
 		
-		// find bound in vertical direction
-		int smallestY = Integer.MAX_VALUE;
-		int x, y;
+		// find minimum bound in vertical direction
+		int ymin = Integer.MAX_VALUE;
 		for (int i = 0; i < n; i++)
 		{
-			y = yCoordinates[i];
-			if (y < smallestY)
-				smallestY = y;
+			ymin = Math.min(ymin, yCoords[i]);
 		}
 	
 		// find left-most vertex of horizontal line with smallest y
-		int smallestX = Integer.MAX_VALUE;
 		int p1 = 0;
+		int xmin = Integer.MAX_VALUE;
 		for (int i = 0; i < n; i++)
 		{
-			x = xCoordinates[i];
-			y = yCoordinates[i];
-			if (y == smallestY && x < smallestX)
+			int x = xCoords[i];
+			int y = yCoords[i];
+			if (y == ymin && x < xmin)
 			{
-				smallestX = x;
+				xmin = x;
 				p1 = i;
 			}
 		}
@@ -160,24 +158,24 @@ public class ConvexHull
 		do
 		{
 			// coordinates of current convex hull vertex
-			int x1 = xCoordinates[p1];
-			int y1 = yCoordinates[p1];
+			int x1 = xCoords[p1];
+			int y1 = yCoords[p1];
 			
 			// coordinates of next vertex candidate
 			int p2 = (p1 + 1) % n;
-			int x2 = xCoordinates[p2];
-			int y2 = yCoordinates[p2];
+			int x2 = xCoords[p2];
+			int y2 = yCoords[p2];
 	
 			// find the next "wrapping" vertex by computing oriented angle
 			int p3 = (p2 + 1) % n;
 			do
 			{
-				int x3 = xCoordinates[p3];
-				int y3 = yCoordinates[p3];
+				int x3 = xCoords[p3];
+				int y3 = yCoords[p3];
 				
 				// if V1-V2-V3 is oriented CW, use V3 as next wrapping candidate
-				int determinate = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
-				if (determinate < 0)
+				int det = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
+				if (det < 0)
 				{
 					x2 = x3;
 					y2 = y3;
@@ -194,43 +192,42 @@ public class ConvexHull
 	}
 
 	/**
-	 * Uses the gift wrap algorithm to find the convex hull and returns it as a
-	 * Polygon.
+	 * Uses the gift wrap algorithm to find the convex hull of a PolygonRoi, and
+	 * returns it as a Polygon.
 	 * 
-	 * Code from ij.gui.PolygonRoi.getConvexHull().
+	 * Code adapted from ij.gui.PolygonRoi.getConvexHull().
 	 */
-	public static final Polygon getConvexHull(PolygonRoi polygonRoi)
+	public static final Polygon convexHull(PolygonRoi polygonRoi)
 	{
-		// Get polygon info
+		// get vertex coordinates
 		int n = polygonRoi.getNCoordinates();
 		int[] xCoordinates = polygonRoi.getXCoordinates();
 		int[] yCoordinates = polygonRoi.getYCoordinates();
+		
+		// lower bounds of the polygon
 		Rectangle r = polygonRoi.getBounds();
-	
-		// lower bounds
 		int xbase = r.x;
 		int ybase = r.y;
 		
-		// convex hull coordinates
+		// allocate array for convex hull coordinates
 		int[] xx = new int[n];
 		int[] yy = new int[n];
 		
 		// number of vertices in hull
 		int n2 = 0;
 		
+		int x, y;
+
 		// find bound in vertical direction
 		int smallestY = Integer.MAX_VALUE;
-		int x, y;
 		for (int i = 0; i < n; i++)
 		{
-			y = yCoordinates[i];
-			if (y < smallestY)
-				smallestY = y;
+			smallestY = Math.min(smallestY, yCoordinates[i]);
 		}
 	
 		// find left-most vertex of horizontal line with smallest y
-		int smallestX = Integer.MAX_VALUE;
 		int p1 = 0;
+		int smallestX = Integer.MAX_VALUE;
 		for (int i = 0; i < n; i++)
 		{
 			x = xCoordinates[i];
@@ -242,39 +239,30 @@ public class ConvexHull
 			}
 		}
 		
-		
 		int pstart = p1;
-		int x1, y1, x2, y2, x3, y3, p2, p3;
-		int determinate;
 		int count = 0;
 		do
 		{
-			x1 = xCoordinates[p1];
-			y1 = yCoordinates[p1];
-			p2 = p1 + 1;
-			if (p2 == n)
-				p2 = 0;
-			x2 = xCoordinates[p2];
-			y2 = yCoordinates[p2];
+			int x1 = xCoordinates[p1];
+			int y1 = yCoordinates[p1];
+			int p2 = (p1 + 1) % n; // modulo
+			int x2 = xCoordinates[p2];
+			int y2 = yCoordinates[p2];
 			
-			p3 = p2 + 1;
-			if (p3 == n)
-				p3 = 0;
+			int p3 = (p2 + 1) % n; // modulo
 			
 			do
 			{
-				x3 = xCoordinates[p3];
-				y3 = yCoordinates[p3];
-				determinate = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
-				if (determinate > 0)
+				int x3 = xCoordinates[p3];
+				int y3 = yCoordinates[p3];
+				int det = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
+				if (det > 0)
 				{
 					x2 = x3;
 					y2 = y3;
 					p2 = p3;
 				}
-				p3 += 1;
-				if (p3 == n)
-					p3 = 0;
+				p3 = (p3 + 1) % n; // modulo
 			} while (p3 != p1);
 			
 			if (n2 < n)
@@ -294,5 +282,4 @@ public class ConvexHull
 		
 		return new Polygon(xx, yy, n2);
 	}
-
 }
