@@ -39,7 +39,10 @@ public class FeretDiametersTest
 		ImageProcessor image = imagePlus.getProcessor();
 		double diameter = FeretDiameters.minFeretDiameterSingle(image).diameter;
 		
-		assertEquals(108.8, diameter, .05);
+		// compare with the result of the "imOrientedBox" function, from the
+		// MatImage libray for Matlab
+		// (intermediate result obtained before adding the spacing of one pixel in each direction).
+		assertEquals(107.46, diameter, .02);
 	}
 
 
