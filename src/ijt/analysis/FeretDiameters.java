@@ -73,9 +73,8 @@ public class FeretDiameters
 	 */
 	public final static AngleDiameterPair minFeretDiameterSingle(ImageProcessor image)
 	{
-		//TODO: should work on pixel corners
-		ArrayList<Point> points = boundaryPoints(image);
-		ArrayList<Point> convHull = Polygons2D.convexHull_jarvis_int(points);
+		ArrayList<Point2D> points = binaryParticleCorners(image);
+		ArrayList<Point2D> convHull = Polygons2D.convexHull_jarvis(points);
 	
 		return minFeretDiameter(convHull);
 	}
@@ -91,7 +90,8 @@ public class FeretDiameters
 	 */
 	public final static AngleDiameterPair minFeretDiameter(ArrayList<? extends Point2D> points)
 	{
-		 return minFeretDiameterNaive(points);
+		// TODO: change to rotating caliper algorithm
+		return minFeretDiameterNaive(points);
 	}
 	 
 	/**

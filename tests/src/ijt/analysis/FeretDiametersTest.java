@@ -41,8 +41,8 @@ public class FeretDiametersTest
 		
 		// compare with the result of the "imOrientedBox" function, from the
 		// MatImage libray for Matlab
-		// (intermediate result obtained before adding the spacing of one pixel in each direction).
-		assertEquals(107.46, diameter, .02);
+		// (both functions compute min feret on pixel corners)
+		assertEquals(108.86, diameter, .01);
 	}
 
 
