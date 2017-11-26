@@ -66,33 +66,4 @@ public class FeretDiametersTest
 		assertEquals(20, minDiam, .01);
 	}
 
-	public void testConvexHull_jarvis_int()
-	{
-		ArrayList<Point> polygon = new ArrayList<Point>();
-		polygon.add(new Point( 30,  90));
-		polygon.add(new Point(110,  10));
-		polygon.add(new Point( 60,  80));
-		polygon.add(new Point( 40,  30));
-		polygon.add(new Point( 50, 150));
-		polygon.add(new Point( 80, 110));
-		polygon.add(new Point( 10,  60));
-		polygon.add(new Point( 70,  40));
-		polygon.add(new Point( 90,  70));
-		polygon.add(new Point(140,  50));
-		polygon.add(new Point(100, 130));
-		polygon.add(new Point(160, 140));
-		polygon.add(new Point(150,  20));
-		polygon.add(new Point(130, 160));
-		polygon.add(new Point( 20, 120));
-		polygon.add(new Point(120, 100));
-
-		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(polygon);
-		
-		int i = 0;
-		for (Point p : convHull)
-		{
-			System.out.println(String.format("Vertex %2d = (%3d, %3d)", i++, p.x, p.y));
-		}
-	}
-
 }

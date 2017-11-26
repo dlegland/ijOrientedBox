@@ -34,7 +34,7 @@ public class ConvexHull_Circles
 		ArrayList<Point2D> points = FeretDiameters.binaryParticleCorners(image);
 		System.out.println("number of points: " + points.size());
 
-		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(points);
 
 		PolygonRoi roi = createPolygonRoi(convexHull);
 		imagePlus.setRoi(roi, true);

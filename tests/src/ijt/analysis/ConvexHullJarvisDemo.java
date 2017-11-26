@@ -24,7 +24,7 @@ public class ConvexHullJarvisDemo extends Application
 	public void start(Stage stage) 
 	{
 		initializePolygon_random(500);
-		convHull = ConvexHull.convexHull_jarvis_int(polygon);
+		convHull = Polygons2D.convexHull_jarvis_int(polygon);
 		
         Group root = new Group();
         for (Point p : polygon)

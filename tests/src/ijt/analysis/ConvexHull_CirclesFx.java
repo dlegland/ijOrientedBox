@@ -43,7 +43,7 @@ public class ConvexHull_CirclesFx extends Application
 		ArrayList<Point> points = FeretDiameters.boundaryPoints(image);
 		System.out.println("number of points: " + points.size());
 
-		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(points);
+		ArrayList<Point> convHull = Polygons2D.convexHull_jarvis_int(points);
 		
 		ImageView imv = new ImageView();
 		imv.setImage(convertImage(image));

@@ -29,10 +29,10 @@ public class OrientedBox
 	 */
 	public static final OrientedBox computeBox(ArrayList<? extends Point2D> points)
 	{
-		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(points);
 		
 		// compute convex hull centroid
-		Point2D center = polygonCentroid(convexHull);
+		Point2D center = Polygons2D.centroid(convexHull);
 		double cx = center.getX();
 		double cy = center.getY();
 		
@@ -94,37 +94,6 @@ public class OrientedBox
 		double angle = Math.toDegrees(minFeret.angle);
 
 		return new OrientedBox(cx, cy, length, width, angle);
-	}
-	
-	public static final Point2D polygonCentroid(ArrayList<? extends Point2D> vertices)
-	{
-		// accumulators
-		double sumC = 0;
-		double sumX = 0;
-		double sumY = 0;
-		
-		// iterate on vertex pairs
-		int n = vertices.size();
-		for (int i = 1; i <= n; i++)
-		{
-			Point2D p1 = vertices.get(i - 1);
-			Point2D p2 = vertices.get(i % n);
-			double x1 = p1.getX();
-			double y1 = p1.getY();
-			double x2 = p2.getX();
-			double y2 = p2.getY();
-			double common = x1 * y2 - x2 * y1;
-			
-			sumX += (x1 + x2) * common;
-			sumY += (y1 + y2) * common;
-			sumC += common;
-		}
-		
-		// the area is the sum of the common factors divided by 2, 
-		// but we need to divide by 6 for centroid computation, 
-		// resulting in a factor 3.
-		sumC *= 6 / 2;
-		return new Point2D.Double(sumX / sumC, sumY / sumC);
 	}
 	
 	

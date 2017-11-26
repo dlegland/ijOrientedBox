@@ -34,7 +34,7 @@ public class OrientedBox_Circles
 		ImageProcessor image = imagePlus.getProcessor();
 		ArrayList<Point2D> points = FeretDiameters.binaryParticleCorners(image);
 		
-		ArrayList<Point2D> convexHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(points);
 		PolygonRoi hullRoi = createPolygonRoi(convexHull);
 		imagePlus.setRoi(hullRoi, true);
 		

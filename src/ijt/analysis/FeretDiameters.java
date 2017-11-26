@@ -19,16 +19,20 @@ public class FeretDiameters
 	
 	/**
 	 * Computes Maximum Feret diameter from a single particle in a binary image.
-	 *  
-	 * @param image a binary image representing the particle.
+	 * 
+	 * Computes diameter between corners of image pixels, so the result is
+	 * always greater than or equal to one.
+	 * 
+	 * @param image
+	 *            a binary image representing the particle.
 	 * @return the maximum Feret diameter of the particle
 	 */
 	public final static AngleDiameterPair maxFeretDiameterSingle(ImageProcessor image)
 	{
 //		ArrayList<Point> points = boundaryPoints(image);
-//		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(points);
+//		ArrayList<Point> convHull = Polygons2D.convexHull_jarvis_int(points);
 		ArrayList<Point2D> points = binaryParticleCorners(image);
-		ArrayList<Point2D> convHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convHull = Polygons2D.convexHull_jarvis(points);
 
 		return maxFeretDiameter(convHull);
 	}
@@ -36,9 +40,11 @@ public class FeretDiameters
 	/**
 	 * Computes Maximum Feret diameter of a set of points.
 	 * 
-	 * Note: it is often a good idea to compute convex hull before computing Feret diameter.
-	 *  
-	 * @param points a collection of planar points
+	 * Note: it is often a good idea to compute convex hull before computing
+	 * Feret diameter.
+	 * 
+	 * @param points
+	 *            a collection of planar points
 	 * @return the maximum Feret diameter of the point set
 	 */
 	public final static AngleDiameterPair maxFeretDiameter(ArrayList<? extends Point2D> points)
@@ -60,14 +66,16 @@ public class FeretDiameters
 	
 	/**
 	 * Computes Minimum Feret diameter from a single particle in a binary image.
-	 *  
-	 * @param image a binary image representing the particle.
+	 * 
+	 * @param image
+	 *            a binary image representing the particle.
 	 * @return the minimum Feret diameter of the particle
 	 */
 	public final static AngleDiameterPair minFeretDiameterSingle(ImageProcessor image)
 	{
+		//TODO: should work on pixel corners
 		ArrayList<Point> points = boundaryPoints(image);
-		ArrayList<Point> convHull = ConvexHull.convexHull_jarvis_int(points);
+		ArrayList<Point> convHull = Polygons2D.convexHull_jarvis_int(points);
 	
 		return minFeretDiameter(convHull);
 	}
@@ -97,7 +105,7 @@ public class FeretDiameters
 	public final static AngleDiameterPair minFeretDiameterRotatingCaliper(ArrayList<? extends Point2D> points)
 	{
 		// first compute convex hull to simplify
-		ArrayList<Point2D> convHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convHull = Polygons2D.convexHull_jarvis(points);
 		int n = convHull.size();
 		
 		// find index of extreme vertices in vertical direction
@@ -193,11 +201,10 @@ public class FeretDiameters
 	public final static AngleDiameterPair minFeretDiameterNaive(ArrayList<? extends Point2D> points)
 	{
 		// first compute convex hull to simplify
-		ArrayList<Point2D> convHull = ConvexHull.convexHull_jarvis(points);
+		ArrayList<Point2D> convHull = Polygons2D.convexHull_jarvis(points);
 		int n = convHull.size();
 
 		// initialize result
-		double width;
 		double widthMin = Double.POSITIVE_INFINITY;
 		double angleMin = 0;
 		StraightLine2D line;
@@ -215,7 +222,7 @@ public class FeretDiameters
 
 			// Compute the width for this polygon edge
 			line = new StraightLine2D(p1, p2);
-			width = 0;
+			double width = 0;
 			for (Point2D p : convHull)
 			{
 				double dist = line.distance(p);
@@ -257,7 +264,8 @@ public class FeretDiameters
 			boolean inside = false;
 			for (int x = 0; x < width; x++)
 			{
-				if (image.get(x, y) > 0 && !inside)
+				int pixel = image.get(x, y);
+				if (pixel > 0 && !inside)
 				{
 					// transition from background to foreground
 					Point2D p = new Point2D.Double(x, y);
@@ -268,7 +276,7 @@ public class FeretDiameters
 					points.add(new Point2D.Double(x, y+1));
 					inside = true;
 				} 
-				else if (image.get(x, y) == 0 && inside)
+				else if (pixel == 0 && inside)
 				{
 					// transition from foreground to background 
 					Point2D p = new Point2D.Double(x, y);
@@ -305,12 +313,13 @@ public class FeretDiameters
 	 */
 	public final static ArrayList<Point> boundaryPoints(ImageProcessor image)
 	{
+		// size of input image
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		ArrayList<Point> points = new ArrayList<>();
 		
-		// try to fin a pair of points for each row
+		// try to find a pair of points for each row
 		for (int y = 0; y < height; y++)
 		{
 			// Identify transition inside and outside the particle 
@@ -342,7 +351,8 @@ public class FeretDiameters
 	}
 
 	/**
-	 * Data structure used to return result of feret diameter computation.
+	 * Data structure used to return result of Feret diameters computation. Can
+	 * be used to return the result of minimum or maximum diameters computation.
 	 * 
 	 * @author dlegland
 	 *
