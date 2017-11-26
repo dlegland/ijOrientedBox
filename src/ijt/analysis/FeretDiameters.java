@@ -257,7 +257,7 @@ public class FeretDiameters
 		
 		ArrayList<Point2D> points = new ArrayList<>();
 		
-		// try to fin a pair of points for each row
+		// try to find a pair of points for each row
 		for (int y = 0; y < height; y++)
 		{
 			// Identify transition inside and outside the particle 
