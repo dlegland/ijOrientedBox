@@ -4,6 +4,7 @@
 package ijt.analysis;
 
 import ij.gui.PolygonRoi;
+import ij.gui.Roi;
 
 import java.awt.Point;
 import java.awt.Polygon;
@@ -334,4 +335,21 @@ public class Polygons2D
 		
 		return new Polygon(xx, yy, n2);
 	}
+	
+	public static PolygonRoi createPolygonRoi(ArrayList<Point2D> coords)
+	{
+		int n = coords.size();
+		float[] px = new float[n];
+		float[] py = new float[n];
+		
+		for (int i = 0; i < n; i++)
+		{
+			Point2D p = coords.get(i);
+			px[i] = (float) p.getX();
+			py[i] = (float) p.getY();
+		}
+
+		return new PolygonRoi(px, py, n, Roi.POLYGON);
+	}
+
 }

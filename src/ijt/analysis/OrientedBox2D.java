@@ -18,7 +18,7 @@ import ij.gui.Roi;
  * @author dlegland
  *
  */
-public class OrientedBox
+public class OrientedBox2D
 {
 	/**
 	 * Computes the object-oriented bounding box of a set of points.
@@ -27,7 +27,7 @@ public class OrientedBox
 	 *            a list of points (not necessarily ordered)
 	 * @return the oriented box of this set of points.
 	 */
-	public static final OrientedBox computeBox(ArrayList<? extends Point2D> points)
+	public static final OrientedBox2D computeBox(ArrayList<? extends Point2D> points)
 	{
 		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(points);
 		
@@ -93,7 +93,7 @@ public class OrientedBox
 		// store angle in degrees
 		double angle = Math.toDegrees(minFeret.angle);
 
-		return new OrientedBox(cx, cy, length, width, angle);
+		return new OrientedBox2D(cx, cy, length, width, angle);
 	}
 	
 	
@@ -130,7 +130,7 @@ public class OrientedBox
 	 *            The orientation of the box, in degrees, counted
 	 *            counter-clockwise from the horizontal.
 	 */
-	public OrientedBox(double x0, double y0, double length, double width, double theta)
+	public OrientedBox2D(double x0, double y0, double length, double width, double theta)
 	{
 		this.x0 = x0;
 		this.y0 = y0;

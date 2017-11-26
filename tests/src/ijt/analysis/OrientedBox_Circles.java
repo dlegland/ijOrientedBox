@@ -5,7 +5,6 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
-import ij.gui.Roi;
 import ij.process.ImageProcessor;
 
 import java.awt.Color;
@@ -35,11 +34,11 @@ public class OrientedBox_Circles
 		ArrayList<Point2D> points = FeretDiameters.binaryParticleCorners(image);
 		
 		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(points);
-		PolygonRoi hullRoi = createPolygonRoi(convexHull);
+		PolygonRoi hullRoi = Polygons2D.createPolygonRoi(convexHull);
 		imagePlus.setRoi(hullRoi, true);
 		
 		System.out.println("number of points: " + points.size());
-		OrientedBox obox = OrientedBox.computeBox(points);
+		OrientedBox2D obox = OrientedBox2D.computeBox(points);
 
 		System.out.println("oriented box: ");
 		System.out.println("  xc: " + obox.x0);
@@ -59,24 +58,5 @@ public class OrientedBox_Circles
 		ovr.add(roi);
 		
 		imagePlus.setOverlay(ovr);
-	}
-	
-	
-	
-	public static PolygonRoi createPolygonRoi(ArrayList<Point2D> coords)
-	{
-		int n = coords.size();
-		float[] px = new float[n];
-		float[] py = new float[n];
-		
-		for (int i = 0; i < n; i++)
-		{
-			Point2D p = coords.get(i);
-			px[i] = (float) p.getX();
-			py[i] = (float) p.getY();
-		}
-
-		return new PolygonRoi(px, py, n, Roi.POLYGON);
-	}
-
+	}	
 }
