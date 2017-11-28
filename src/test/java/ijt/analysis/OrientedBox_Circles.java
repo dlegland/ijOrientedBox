@@ -49,9 +49,6 @@ public class OrientedBox_Circles
 		System.out.println("  w:  " + obox.width);
 		System.out.println("  Th:  " + obox.theta);
 
-//		// use pre-computed oriented box
-//		OrientedBox obox = new OrientedBox(108.2667, 130.0151, 268.9114, 109.2686, 61);
-		
 		PolygonRoi roi = obox.getRoi();
 		roi.setStrokeColor(Color.GREEN);
 		roi.setStrokeWidth(.5);

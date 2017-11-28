@@ -30,7 +30,7 @@ public class OrientedBox2DTest
 		assertNotNull(imagePlus);
 		
 		ImageProcessor image = imagePlus.getProcessor();
-		ResultsTable table = OrientedBox2D.orientedBox(image);
+		ResultsTable table = OrientedBox2D.asTable(OrientedBox2D.orientedBox(image));
 	
 		imagePlus.show();
 		HashMap<Integer, ArrayList<Point2D>> labelCorners = OrientedBox2D.computeLabelsCorners(image, new int[]{255});

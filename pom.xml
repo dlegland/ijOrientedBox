@@ -7,7 +7,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>1.126</version>
+		<version>17.1.1</version>
 		<relativePath />
 	</parent>
 
@@ -23,14 +23,12 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
-			<version>${imagej1.version}</version>
 		</dependency>
 	
 		<!-- Add a dependency to JUnit for unit tests --> 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
         
@@ -111,7 +109,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<developer>
 			<id>dlegland</id>
 			<name>David Legland</name>
-			<email>david.legland@nantes.inra.fr</email>
+			<email>david.legland@inra.fr</email>
 			<organization>INRA</organization>
 			<roles>
 				<role>architect</role>

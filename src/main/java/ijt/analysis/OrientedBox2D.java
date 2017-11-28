@@ -6,6 +6,7 @@ package ijt.analysis;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import ij.ImagePlus;
 import ij.gui.Overlay;
@@ -24,6 +25,9 @@ import inra.ijpb.label.LabelImages;
  */
 public class OrientedBox2D
 {
+	// ====================================================
+	// Static methods
+
 	/**
 	 * Computes the object-oriented bounding box of a set of points.
 	 * 
@@ -49,7 +53,6 @@ public class OrientedBox2D
 		
 		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
 //		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
-		
 		
 		// orientation of the main axis
 		// pre-compute trigonometric functions
@@ -95,9 +98,9 @@ public class OrientedBox2D
 		double width  = xmax - xmin;
 		
 		// store angle in degrees, between 0 and 180
-		double angle = Math.toDegrees(minFeret.angle) + 90;
-		angle = (angle % 180);
+		double angle = (Math.toDegrees(minFeret.angle) + 270) % 180;
 
+		// Store results in a new instance of OrientedBox2D
 		return new OrientedBox2D(cx, cy, length, width, angle);
 	}
 	
@@ -109,7 +112,7 @@ public class OrientedBox2D
 	 *            a label image (8, 16 or 32 bits)
 	 * @return a ResultsTable containing oriented box parameters
 	 */
-	public final static ResultsTable orientedBox(ImageProcessor image)
+	public final static Map<Integer, OrientedBox2D> orientedBox(ImageProcessor image)
 	{
 		// Check validity of parameters
 		if (image == null)
@@ -122,23 +125,36 @@ public class OrientedBox2D
         // For each label, create a list of corner points
         HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = computeLabelsCorners(image, labels);
         
-        OrientedBox2D[] oboxes = new OrientedBox2D[nLabels];
+        // Compute the oriented box of each set of corner points
+        Map<Integer, OrientedBox2D> labelBoxMap = new HashMap<Integer, OrientedBox2D>();
         for (int i = 0; i < nLabels; i++)
         {
-        	oboxes[i] = computeBox(labelCornerPoints.get(labels[i]));
+        	int label = labels[i];
+        	labelBoxMap.put(label, computeBox(labelCornerPoints.get(label)));
         }
         
+		return labelBoxMap;
+	}
+
+	/**
+	 * Converts an array of oriented boxes to a ResultsTable containing
+	 * parameters of each oriented box.
+	 * 
+	 * @return a ResultsTable containing oriented box parameters
+	 */
+	public final static ResultsTable asTable(Map<Integer, OrientedBox2D> labelBoxMap)
+	{
 		// Create data table
 		ResultsTable table = new ResultsTable();
 
 		// compute ellipse parameters for each region
-		for (int i = 0; i < nLabels; i++) 
+		for (int label : labelBoxMap.keySet()) 
 		{
-
 			table.incrementCounter();
-			table.addLabel(Integer.toString(labels[i]));
-			// add coordinates of origin pixel (IJ coordinate system)
-			OrientedBox2D obox = oboxes[i];
+			table.addLabel(Integer.toString(label));
+			
+			// add new row containing parameters of oriented box
+			OrientedBox2D obox = labelBoxMap.get(label);
 			table.addValue("Box.Center.X", 	obox.x0);
 			table.addValue("Box.Center.Y",	obox.y0);
 			table.addValue("Box.Length", 	obox.length);
@@ -239,6 +255,9 @@ public class OrientedBox2D
 		return labelCornerPoints;
 	}
 
+	
+	// ====================================================
+	// Class variables
 
 	/** X-coordinate of oriented box center */
 	double x0;
@@ -258,6 +277,10 @@ public class OrientedBox2D
 	 */
 	double theta;
 		
+	
+	// ====================================================
+	// Constructor
+
 	/**
 	 * Creates a new oriented box instance.
 	 * 
@@ -282,6 +305,10 @@ public class OrientedBox2D
 		this.theta = theta;
 	}
 	
+	
+	// ====================================================
+	// Class methods
+
 	/**
 	 * Draws this instance of oriented box on the specified image. 
 	 * @param imp
