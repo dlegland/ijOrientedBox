@@ -3,15 +3,15 @@ package ijt.analysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import ij.IJ;
-import ij.ImagePlus;
-import ij.process.ImageProcessor;
 
 import java.awt.Point;
-import java.io.File;
 import java.util.ArrayList;
 
 import org.junit.Test;
+
+import ij.IJ;
+import ij.ImagePlus;
+import ij.process.ImageProcessor;
 
 public class FeretDiametersTest
 {
@@ -19,7 +19,7 @@ public class FeretDiametersTest
 	@Test
 	public void maxFeretDiameter_single()
 	{
-		String fileName = new File("files/circles.tif").getPath();
+		String fileName = OrientedBox_Circles.class.getResource("/files/circles.tif").getFile();
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		assertNotNull(imagePlus);
 		
@@ -32,7 +32,7 @@ public class FeretDiametersTest
 	@Test
 	public void minFeretDiameter_single()
 	{
-		String fileName = new File("files/circles.tif").getPath();
+		String fileName = getClass().getResource("/files/circles.tif").getFile();
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		assertNotNull(imagePlus);
 		

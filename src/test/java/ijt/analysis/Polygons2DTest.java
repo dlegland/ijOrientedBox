@@ -34,7 +34,7 @@ public class Polygons2DTest
 	}
 
 	/**
-	 * The same polygon, with identical first and last verrtex
+	 * The same polygon, with identical first and last vertex
 	 */
 	@Test
 	public void polygonCentroidTest_Rect2()

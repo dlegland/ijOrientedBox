@@ -94,8 +94,9 @@ public class OrientedBox2D
 		double length = ymax - ymin;
 		double width  = xmax - xmin;
 		
-		// store angle in degrees
-		double angle = Math.toDegrees(minFeret.angle);
+		// store angle in degrees, between 0 and 180
+		double angle = Math.toDegrees(minFeret.angle) + 90;
+		angle = (angle % 180);
 
 		return new OrientedBox2D(cx, cy, length, width, angle);
 	}

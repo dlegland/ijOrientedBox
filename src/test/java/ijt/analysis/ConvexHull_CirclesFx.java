@@ -1,13 +1,11 @@
 package ijt.analysis;
 
+import java.awt.Point;
+import java.util.ArrayList;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
-
-import java.awt.Point;
-import java.io.File;
-import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -36,7 +34,7 @@ public class ConvexHull_CirclesFx extends Application
 	@Override
 	public void start(Stage stage) 
 	{
-		String fileName = new File("files/circles.tif").getPath();
+		String fileName = getClass().getResource("/files/circles.tif").getFile();
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		ImageProcessor image = imagePlus.getProcessor();
 

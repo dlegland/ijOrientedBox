@@ -1,17 +1,16 @@
 package ijt.analysis;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
 import ij.process.ImageProcessor;
-
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Computes oriented bounding box of circles.tif image, and displays result
@@ -27,7 +26,7 @@ public class OrientedBox_Circles
 		@SuppressWarnings("unused")
 		ImageJ ij = new ImageJ();
 		
-		String fileName = new File("files/circles.tif").getPath();
+		String fileName = OrientedBox_Circles.class.getResource("/files/circles.tif").getFile();
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		imagePlus.show();
 

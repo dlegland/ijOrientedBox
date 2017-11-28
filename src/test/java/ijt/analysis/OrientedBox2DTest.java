@@ -2,19 +2,19 @@ package ijt.analysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.junit.Test;
+
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.PolygonRoi;
 import ij.measure.ResultsTable;
 import ij.process.ImageProcessor;
-
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.junit.Test;
 
 
 public class OrientedBox2DTest
@@ -25,7 +25,7 @@ public class OrientedBox2DTest
 		@SuppressWarnings("unused")
 		ImageJ ij = new ImageJ();
 		
-		String fileName = new File("files/circles.tif").getPath();
+		String fileName = getClass().getResource("/files/circles.tif").getFile();
 		ImagePlus imagePlus = IJ.openImage(fileName);
 		assertNotNull(imagePlus);
 		
@@ -40,7 +40,9 @@ public class OrientedBox2DTest
 		PolygonRoi hullRoi = Polygons2D.createPolygonRoi(convexHull);
 		imagePlus.setRoi(hullRoi, true);
 
+		// Length of oriented box
 		assertEquals(272.23, table.getValueAsDouble(2, 0), .05);
+		// width of oriented box
 		assertEquals(108.86, table.getValueAsDouble(3, 0), .05);
 	}
 
