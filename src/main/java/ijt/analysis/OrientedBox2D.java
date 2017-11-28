@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
@@ -119,21 +120,27 @@ public class OrientedBox2D
 			return null;
 
 		// extract particle labels
+		IJ.showStatus("Find Labels");
 		int[] labels = LabelImages.findAllLabels(image);
 		int nLabels = labels.length;
 
         // For each label, create a list of corner points
+		IJ.showStatus("Find Label Corner Points");
         HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = computeLabelsCorners(image, labels);
         
         // Compute the oriented box of each set of corner points
         Map<Integer, OrientedBox2D> labelBoxMap = new HashMap<Integer, OrientedBox2D>();
+		IJ.showStatus("Compute oriented boxes");
         for (int i = 0; i < nLabels; i++)
         {
+        	IJ.showProgress(i, nLabels);
         	int label = labels[i];
         	labelBoxMap.put(label, computeBox(labelCornerPoints.get(label)));
         }
         
-		return labelBoxMap;
+        IJ.showProgress(1);
+        IJ.showStatus("");
+        return labelBoxMap;
 	}
 
 	/**
@@ -148,13 +155,15 @@ public class OrientedBox2D
 		ResultsTable table = new ResultsTable();
 
 		// compute ellipse parameters for each region
-		for (int label : labelBoxMap.keySet()) 
+		int nDigits = ((int) Math.log10(labelBoxMap.size())) + 1;
+		for (Map.Entry<Integer, OrientedBox2D> entry : labelBoxMap.entrySet()) 
 		{
 			table.incrementCounter();
-			table.addLabel(Integer.toString(label));
+			int label = entry.getKey();
+			table.addLabel(String.format("label-%0" + nDigits +"d", label));
 			
 			// add new row containing parameters of oriented box
-			OrientedBox2D obox = labelBoxMap.get(label);
+			OrientedBox2D obox = entry.getValue();
 			table.addValue("Box.Center.X", 	obox.x0);
 			table.addValue("Box.Center.Y",	obox.y0);
 			table.addValue("Box.Length", 	obox.length);

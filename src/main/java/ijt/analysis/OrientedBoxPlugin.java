@@ -28,6 +28,7 @@ import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.Overlay;
+import ij.gui.Roi;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
@@ -113,33 +114,57 @@ public class OrientedBoxPlugin implements PlugInFilter
 		boolean exportToRoiManager = gd.getNextBoolean();
 
 		// Execute the plugin
+		IJ.showStatus("Compute Oriented Boxes");
 		Map<Integer, OrientedBox2D> labelBoxMap = OrientedBox2D.orientedBox(imagePlus.getProcessor());
+		int nBoxes = labelBoxMap.size(); 
 
 		// Show results table
+		IJ.showStatus("Convert To Table");
 		String tableName = imagePlus.getShortTitle() + "-OBoxes";
 		ResultsTable table = OrientedBox2D.asTable(labelBoxMap);
 		table.show(tableName);
 
-		// Optionally overlay on an image 
+		// Optionally overlay on an image
 		ImagePlus overlayImage = WindowManager.getImage(indices[overlayImageIndex]);
 		if (showOverlay)
 		{
+			IJ.showStatus("Compute box overlay");
 			Overlay overlay = new Overlay();
+			int count = 0;
 			for (OrientedBox2D box : labelBoxMap.values())
+			{
+				IJ.showProgress(count++, nBoxes);
 				overlay.add(box.getRoi());
+			}
 			overlayImage.setOverlay(overlay);
+			
+			IJ.showProgress(1);
 		}
 		
+		// Export Oriented Boxed to ROI Manager
 		if (exportToRoiManager)
 		{
+			IJ.showStatus("Compute box ROI");
 			// get instance of ROI Manager
 			RoiManager manager = RoiManager.getRoiManager();
 			int index = 0;
-			for (OrientedBox2D box : labelBoxMap.values())
+			for (Map.Entry<Integer, OrientedBox2D> entry : labelBoxMap.entrySet())
 			{
-				manager.add(overlayImage, box.getRoi(), index++);
+				IJ.showProgress(index, nBoxes);
+				int label = entry.getKey();
+				Roi roi = entry.getValue().getRoi();
+				int nDigits = ((int) Math.log10(nBoxes)) + 1;
+				roi.setName(String.format("label-%0" + nDigits +"d", label));
+//				IJ.log(roi.getName());
+				manager.add(overlayImage, roi, 0);
+				// enforce the name of the ROI
+				manager.rename(index, roi.getName());
+				index++;
 			}
+			IJ.showProgress(1);
 		}
+		
+		IJ.showStatus("");
 	}
 
 //	/**
