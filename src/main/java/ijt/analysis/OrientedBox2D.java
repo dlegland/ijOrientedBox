@@ -162,7 +162,7 @@ public class OrientedBox2D
 		int height = image.getHeight();
 		
         // For each label, create a list of corner points
-        HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = new HashMap<>();
+        HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = new HashMap<Integer, ArrayList<Point2D>>();
         for (int label : labels)
         {
         	labelCornerPoints.put(label, new ArrayList<Point2D>());

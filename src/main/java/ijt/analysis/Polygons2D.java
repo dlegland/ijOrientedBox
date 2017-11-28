@@ -89,7 +89,7 @@ public class Polygons2D
 		}
 		
 		// convex hull coordinates
-		ArrayList<Point2D> hull = new ArrayList<>();
+		ArrayList<Point2D> hull = new ArrayList<Point2D>();
 		
 		// find bound in vertical direction
 		double smallestY = java.lang.Double.MAX_VALUE;
@@ -180,7 +180,7 @@ public class Polygons2D
 		}
 		
 		// create structure for storing convex hull coordinates
-		ArrayList<Point> hull = new ArrayList<>();
+		ArrayList<Point> hull = new ArrayList<Point>();
 		
 		// find minimum bound in vertical direction
 		int ymin = Integer.MAX_VALUE;

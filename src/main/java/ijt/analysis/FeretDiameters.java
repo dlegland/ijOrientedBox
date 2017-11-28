@@ -255,7 +255,7 @@ public class FeretDiameters
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		ArrayList<Point2D> points = new ArrayList<>();
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
 		
 		// try to find a pair of points for each row
 		for (int y = 0; y < height; y++)
@@ -317,7 +317,7 @@ public class FeretDiameters
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
-		ArrayList<Point> points = new ArrayList<>();
+		ArrayList<Point> points = new ArrayList<Point>();
 		
 		// try to find a pair of points for each row
 		for (int y = 0; y < height; y++)

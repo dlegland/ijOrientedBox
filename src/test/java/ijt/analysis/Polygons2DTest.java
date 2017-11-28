@@ -20,7 +20,7 @@ public class Polygons2DTest
 	@Test
 	public void polygonCentroidTest_Rect1()
 	{
-		ArrayList<Point2D> vertices = new ArrayList<>(4);
+		ArrayList<Point2D> vertices = new ArrayList<Point2D>(4);
 		vertices.add(new Point2D.Double(10, 20));
 		vertices.add(new Point2D.Double(10+30, 20));
 		vertices.add(new Point2D.Double(10+30, 20+40));
@@ -39,7 +39,7 @@ public class Polygons2DTest
 	@Test
 	public void polygonCentroidTest_Rect2()
 	{
-		ArrayList<Point2D> vertices = new ArrayList<>(5);
+		ArrayList<Point2D> vertices = new ArrayList<Point2D>(5);
 		vertices.add(new Point2D.Double(10, 20));
 		vertices.add(new Point2D.Double(10+30, 20));
 		vertices.add(new Point2D.Double(10+30, 20+40));
