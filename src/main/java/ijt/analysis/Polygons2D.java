@@ -3,14 +3,12 @@
  */
 package ijt.analysis;
 
-import ij.gui.PolygonRoi;
-import ij.gui.Roi;
-
 import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
+import ij.gui.PolygonRoi;
+import ij.gui.Roi;
 
 /**
  * A set of static methods operating on polygons.
@@ -92,26 +90,26 @@ public class Polygons2D
 		ArrayList<Point2D> hull = new ArrayList<Point2D>();
 		
 		// find bound in vertical direction
-		double smallestY = java.lang.Double.MAX_VALUE;
+		double ymin = java.lang.Double.MAX_VALUE;
 		double x, y;
 		for (int i = 0; i < n; i++)
 		{
 			y = yCoordinates[i];
-			if (y < smallestY)
-				smallestY = y;
+			if (y < ymin)
+				ymin = y;
 		}
 	
 		// find left-most vertex of horizontal line with smallest y
 		double smallestX = java.lang.Double.MAX_VALUE;
-		int p1 = 0;
+		int pStart = 0;
 		for (int i = 0; i < n; i++)
 		{
 			x = xCoordinates[i];
 			y = yCoordinates[i];
-			if (y == smallestY && x < smallestX)
+			if (y == ymin && x < smallestX)
 			{
 				smallestX = x;
-				p1 = i;
+				pStart = i;
 			}
 		}
 		
@@ -119,7 +117,7 @@ public class Polygons2D
 		// p2: index of current candidate for next hull vertex
 		// p3: index of iterator on point set
 		
-		int pstart = p1;
+		int p1 = pStart;
 		do
 		{
 			// coordinates of current convex hull vertex
@@ -141,7 +139,6 @@ public class Polygons2D
 				// if V1-V2-V3 is oriented CW, use V3 as next wrapping candidate
 				double det = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
 				if (det < 0)
-//				if (det < 1e-12)
 				{
 					x2 = x3;
 					y2 = y3;
@@ -152,14 +149,14 @@ public class Polygons2D
 			
 			hull.add(new Point2D.Double(x1, y1));
 			p1 = p2;
-		} while (p1 != pstart);
+		} while (p1 != pStart);
 	
 		return hull;
 	}
 
 	/**
-	 * Uses the gift wrap algorithm with integer to find the convex hull and
-	 * returns it as a list of points.
+	 * Uses the gift wrap algorithm with integer values to find the convex hull
+	 * of a list of vertices, and returns it as an ordered list of points.
 	 * 
 	 * Code from ij.gui.PolygonRoi.getConvexHull(), adapted to return a polygon
 	 * oriented counter-clockwise.
@@ -190,7 +187,7 @@ public class Polygons2D
 		}
 	
 		// find left-most vertex of horizontal line with smallest y
-		int p1 = 0;
+		int pStart = 0;
 		int xmin = Integer.MAX_VALUE;
 		for (int i = 0; i < n; i++)
 		{
@@ -199,7 +196,7 @@ public class Polygons2D
 			if (y == ymin && x < xmin)
 			{
 				xmin = x;
-				p1 = i;
+				pStart = i;
 			}
 		}
 		
@@ -207,7 +204,7 @@ public class Polygons2D
 		// p2: index of current candidate for next hull vertex
 		// p3: index of iterator on point set
 		
-		int pstart = p1;
+		int p1 = pStart;
 		do
 		{
 			// coordinates of current convex hull vertex
@@ -239,103 +236,11 @@ public class Polygons2D
 			
 			hull.add(new Point(x1, y1));
 			p1 = p2;
-		} while (p1 != pstart);
+		} while (p1 != pStart);
 	
 		return hull;
 	}
 
-	/**
-	 * Uses the gift wrap algorithm to find the convex hull of a PolygonRoi, and
-	 * returns it as a Polygon.
-	 * 
-	 * Code adapted from ij.gui.PolygonRoi.getConvexHull().
-	 */
-	public static final Polygon convexHull(PolygonRoi polygonRoi)
-	{
-		// get vertex coordinates
-		int n = polygonRoi.getNCoordinates();
-		int[] xCoordinates = polygonRoi.getXCoordinates();
-		int[] yCoordinates = polygonRoi.getYCoordinates();
-		
-		// lower bounds of the polygon
-		Rectangle r = polygonRoi.getBounds();
-		int xbase = r.x;
-		int ybase = r.y;
-		
-		// allocate array for convex hull coordinates
-		int[] xx = new int[n];
-		int[] yy = new int[n];
-		
-		// number of vertices in hull
-		int n2 = 0;
-		
-		int x, y;
-
-		// find bound in vertical direction
-		int smallestY = Integer.MAX_VALUE;
-		for (int i = 0; i < n; i++)
-		{
-			smallestY = Math.min(smallestY, yCoordinates[i]);
-		}
-	
-		// find left-most vertex of horizontal line with smallest y
-		int p1 = 0;
-		int smallestX = Integer.MAX_VALUE;
-		for (int i = 0; i < n; i++)
-		{
-			x = xCoordinates[i];
-			y = yCoordinates[i];
-			if (y == smallestY && x < smallestX)
-			{
-				smallestX = x;
-				p1 = i;
-			}
-		}
-		
-		int pstart = p1;
-		int count = 0;
-		do
-		{
-			int x1 = xCoordinates[p1];
-			int y1 = yCoordinates[p1];
-			int p2 = (p1 + 1) % n; // modulo
-			int x2 = xCoordinates[p2];
-			int y2 = yCoordinates[p2];
-			
-			int p3 = (p2 + 1) % n; // modulo
-			
-			do
-			{
-				int x3 = xCoordinates[p3];
-				int y3 = yCoordinates[p3];
-				int det = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
-				if (det > 0)
-				{
-					x2 = x3;
-					y2 = y3;
-					p2 = p3;
-				}
-				p3 = (p3 + 1) % n; // modulo
-			} while (p3 != p1);
-			
-			if (n2 < n)
-			{
-				xx[n2] = xbase + x1;
-				yy[n2] = ybase + y1;
-				n2++;
-			} 
-			else
-			{
-				count++;
-				if (count > 10)
-					return null;
-			}
-			p1 = p2;
-		} while (p1 != pstart);
-		
-		return new Polygon(xx, yy, n2);
-	}
-	
 	public static PolygonRoi createPolygonRoi(ArrayList<Point2D> coords)
 	{
 		int n = coords.size();
