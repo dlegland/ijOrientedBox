@@ -148,14 +148,12 @@ public class OrientedBoxPlugin implements PlugInFilter
 			// get instance of ROI Manager
 			RoiManager manager = RoiManager.getRoiManager();
 			int index = 0;
-			for (Map.Entry<Integer, OrientedBox2D> entry : labelBoxMap.entrySet())
+			int nDigits = ((int) Math.log10(nBoxes)) + 1;
+			for (int label : labelBoxMap.keySet())
 			{
 				IJ.showProgress(index, nBoxes);
-				int label = entry.getKey();
-				Roi roi = entry.getValue().getRoi();
-				int nDigits = ((int) Math.log10(nBoxes)) + 1;
-				roi.setName(String.format("label-%0" + nDigits +"d", label));
-//				IJ.log(roi.getName());
+				Roi roi = labelBoxMap.get(label).getRoi();
+				roi.setName(String.format("lbl-%0" + nDigits +"d", label));
 				manager.add(overlayImage, roi, 0);
 				// enforce the name of the ROI
 				manager.rename(index, roi.getName());

@@ -140,8 +140,8 @@ public class Polygons2D
 				
 				// if V1-V2-V3 is oriented CW, use V3 as next wrapping candidate
 				double det = x1 * (y2 - y3) - y1 * (x2 - x3) + (y3 * x2 - y2 * x3);
-//				if (det < 0)
-				if (det < 1e-12)
+				if (det < 0)
+//				if (det < 1e-12)
 				{
 					x2 = x3;
 					y2 = y3;

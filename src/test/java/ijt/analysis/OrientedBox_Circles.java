@@ -3,7 +3,7 @@ package ijt.analysis;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import ij.IJ;
 import ij.ImageJ;
@@ -32,7 +32,7 @@ public class OrientedBox_Circles
 
 		ImageProcessor image = imagePlus.getProcessor();
 //		ArrayList<Point2D> corners = FeretDiameters.binaryParticleCorners(image);
-		HashMap<Integer, ArrayList<Point2D>> labelCorners = OrientedBox2D.computeLabelsCorners(image, new int[]{255});
+		Map<Integer, ArrayList<Point2D>> labelCorners = OrientedBox2D.computeLabelsCorners(image, new int[]{255});
 		ArrayList<Point2D> corners = labelCorners.get(255);
 
 		ArrayList<Point2D> convexHull = Polygons2D.convexHull_jarvis(corners);

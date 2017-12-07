@@ -5,8 +5,8 @@ package ijt.analysis;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -45,15 +45,15 @@ public class OrientedBox2D
 		double cx = center.getX();
 		double cy = center.getY();
 		
+//		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
+		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
+		
 		// recenter the convex hull
 		ArrayList<Point2D> centeredHull = new ArrayList<Point2D>(convexHull.size());
 		for (Point2D p : convexHull)
 		{
 			centeredHull.add(new Point2D.Double(p.getX() - cx, p.getY() - cy));
 		}
-		
-		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(centeredHull);
-//		FeretDiameters.AngleDiameterPair minFeret = FeretDiameters.minFeretDiameter(convexHull);
 		
 		// orientation of the main axis
 		// pre-compute trigonometric functions
@@ -105,6 +105,7 @@ public class OrientedBox2D
 		return new OrientedBox2D(cx, cy, length, width, angle);
 	}
 	
+	
 	/**
 	 * Computes parameters of oriented box for each label of the input label
 	 * image.
@@ -126,16 +127,17 @@ public class OrientedBox2D
 
         // For each label, create a list of corner points
 		IJ.showStatus("Find Label Corner Points");
-        HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = computeLabelsCorners(image, labels);
-        
+//        HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = computeLabelsCorners(image, labels);
+        ArrayList<Point2D>[] labelCornerPointsArray = computeLabelsCornersArray(image, labels);
+                
         // Compute the oriented box of each set of corner points
-        Map<Integer, OrientedBox2D> labelBoxMap = new HashMap<Integer, OrientedBox2D>();
+        Map<Integer, OrientedBox2D> labelBoxMap = new TreeMap<Integer, OrientedBox2D>();
 		IJ.showStatus("Compute oriented boxes");
         for (int i = 0; i < nLabels; i++)
         {
         	IJ.showProgress(i, nLabels);
         	int label = labels[i];
-        	labelBoxMap.put(label, computeBox(labelCornerPoints.get(label)));
+        	labelBoxMap.put(label, computeBox(labelCornerPointsArray[i]));
         }
         
         IJ.showProgress(1);
@@ -156,14 +158,13 @@ public class OrientedBox2D
 
 		// compute ellipse parameters for each region
 		int nDigits = ((int) Math.log10(labelBoxMap.size())) + 1;
-		for (Map.Entry<Integer, OrientedBox2D> entry : labelBoxMap.entrySet()) 
+		for (int label : labelBoxMap.keySet()) 
 		{
 			table.incrementCounter();
-			int label = entry.getKey();
-			table.addLabel(String.format("label-%0" + nDigits +"d", label));
+			table.addLabel(String.format("lbl-%0" + nDigits +"d", label));
 			
 			// add new row containing parameters of oriented box
-			OrientedBox2D obox = entry.getValue();
+			OrientedBox2D obox = labelBoxMap.get(label);
 			table.addValue("Box.Center.X", 	obox.x0);
 			table.addValue("Box.Center.Y",	obox.y0);
 			table.addValue("Box.Length", 	obox.length);
@@ -182,13 +183,13 @@ public class OrientedBox2D
 	 *            a binary image representing the particle
 	 * @return a list of points that can be used for convex hull computation
 	 */
-	public final static HashMap<Integer, ArrayList<Point2D>> computeLabelsCorners(ImageProcessor image, int[] labels)
+	public final static Map<Integer, ArrayList<Point2D>> computeLabelsCorners(ImageProcessor image, int[] labels)
 	{
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
         // For each label, create a list of corner points
-        HashMap<Integer, ArrayList<Point2D>> labelCornerPoints = new HashMap<Integer, ArrayList<Point2D>>();
+        Map<Integer, ArrayList<Point2D>> labelCornerPoints = new TreeMap<Integer, ArrayList<Point2D>>();
         for (int label : labels)
         {
         	labelCornerPoints.put(label, new ArrayList<Point2D>());
@@ -264,7 +265,103 @@ public class OrientedBox2D
 		return labelCornerPoints;
 	}
 
-	
+	/**
+	 * Returns a set of points located at the corners of a binary particle.
+	 * Point coordinates are integer (ImageJ locates pixels in a [0 1]^d area.
+	 * 
+	 * @param image
+	 *            a binary image representing the particle
+	 * @return for erach label, an array of points
+	 */
+	public final static ArrayList<Point2D>[] computeLabelsCornersArray(ImageProcessor image, int[] labels)
+	{
+		int width = image.getWidth();
+		int height = image.getHeight();
+		
+		Map<Integer, Integer> labelIndicesMap = LabelImages.mapLabelIndices(labels);
+		
+        // For each label, create a list of corner points
+		int nLabels = labels.length;
+        @SuppressWarnings("unchecked")
+		ArrayList<Point2D>[] labelCornerPoints =  (ArrayList<Point2D>[]) new ArrayList<?>[nLabels];
+        for (int i = 0; i < nLabels; i++)
+        {
+        	labelCornerPoints[i] = new ArrayList<Point2D>();
+        }
+		
+		// for each row, add corner point for first and last pixel of each run-length
+		for (int y = 0; y < height; y++)
+		{
+			// start from background
+			int currentLabel = 0;
+
+			// Identify transition inside and outside the each label
+			for (int x = 0; x < width; x++)
+			{
+				int pixel = (int) image.getf(x, y);
+				
+				if (pixel > 0 && pixel != currentLabel)
+				{
+					// transition into a new region
+					
+					// if leave a region, add a new corner points for the end of the region
+					if (currentLabel > 0)
+					{
+						int labelIndex = labelIndicesMap.get(currentLabel);
+						ArrayList<Point2D> corners = labelCornerPoints[labelIndex];
+						Point2D p = new Point2D.Double(x, y);
+						if (!corners.contains(p))
+						{
+							corners.add(p);
+						}
+						corners.add(new Point2D.Double(x, y+1));
+					}
+					
+					// add a new corner points for the beginning of the new region
+					int labelIndex = labelIndicesMap.get(pixel);
+					ArrayList<Point2D> corners = labelCornerPoints[labelIndex];
+					Point2D p = new Point2D.Double(x, y);
+					if (!corners.contains(p))
+					{
+						corners.add(p);
+					}
+					corners.add(new Point2D.Double(x, y+1));
+					
+					// update current label
+					currentLabel = pixel;
+				} 
+				else if (pixel == 0 && currentLabel > 0)
+				{
+					// transition from a label to the  background 
+					int labelIndex = labelIndicesMap.get(currentLabel);
+					ArrayList<Point2D> corners = labelCornerPoints[labelIndex];
+					Point2D p = new Point2D.Double(x, y);
+					if (!corners.contains(p))
+					{
+						corners.add(p);
+					}
+					corners.add(new Point2D.Double(x, y+1));
+					currentLabel = 0;
+				}
+			}
+			
+			// if particle touches right border, add another point
+			if (currentLabel > 0)
+			{
+				int labelIndex = labelIndicesMap.get(currentLabel);
+				ArrayList<Point2D> corners = labelCornerPoints[labelIndex];
+				Point2D p = new Point2D.Double(width, y);
+				if (!corners.contains(p))
+				{
+					corners.add(p);
+				}
+				corners.add(new Point2D.Double(width, y+1));
+			}
+		}
+		
+		return labelCornerPoints;
+	}
+
 	// ====================================================
 	// Class variables
 
